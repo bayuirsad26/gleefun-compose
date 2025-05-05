@@ -205,50 +205,50 @@ services:
     labels:
       - traefik.enable=false
 
-  postgres:
-    image: postgres:17.4-alpine3.21
-    command: ["postgres", "-c", "log_statement=all"]
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 500ms
-      retries: 30
-      timeout: 15s
-    environment:
-      POSTGRES_DB: gleefun
-      POSTGRES_USER: gleefun
-      POSTGRES_PASSWORD: e8FSNEX0kG4IREZxyOYU0OtS3YFIjp6EsQLmWGAd0Is=
-    volumes:
-      - postgres-volume:/var/lib/postgresql/data
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.pfc-postgres.rule=Host(`pfc-postgres.localhost`)
-      - traefik.http.services.pfc-postgres.loadbalancer.server.port=5432
+  # postgres:
+  #   image: postgres:17.4-alpine3.21
+  #   command: ["postgres", "-c", "log_statement=all"]
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #     interval: 500ms
+  #     retries: 30
+  #     timeout: 15s
+  #   environment:
+  #     POSTGRES_DB: gleefun
+  #     POSTGRES_USER: gleefun
+  #     POSTGRES_PASSWORD: e8FSNEX0kG4IREZxyOYU0OtS3YFIjp6EsQLmWGAd0Is=
+  #   volumes:
+  #     - postgres-volume:/var/lib/postgresql/data
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.pfc-postgres.rule=Host(`pfc-postgres.localhost`)
+  #     - traefik.http.services.pfc-postgres.loadbalancer.server.port=5432
 
-  redis:
-    image: valkey/valkey:8.1-alpine3.21
-    command: ["valkey-server", "--loglevel", "verbose"]
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping"]
-      interval: 500ms
-      retries: 30
-      timeout: 15s
-    volumes:
-      - redis-volume:/data
-    labels:
-      - traefik.enable=false
+  # redis:
+  #   image: valkey/valkey:8.1-alpine3.21
+  #   command: ["valkey-server", "--loglevel", "verbose"]
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "redis-cli ping"]
+  #     interval: 500ms
+  #     retries: 30
+  #     timeout: 15s
+  #   volumes:
+  #     - redis-volume:/data
+  #   labels:
+  #     - traefik.enable=false
 
-  ipfs:
-    image: ipfs/kubo:v0.34.1
-    depends_on:
-      - traefik
-    volumes:
-      - ipfs-volume:/data/ipfs
-    ports:
-      - 8080:8080
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.pfc-ipfs-gateway.rule=Host(`pfc-ipfs.localhost`)
-      - traefik.http.services.pfc-ipfs-gateway.loadbalancer.server.port=8080
+  # ipfs:
+  #   image: ipfs/kubo:v0.34.1
+  #   depends_on:
+  #     - traefik
+  #   volumes:
+  #     - ipfs-volume:/data/ipfs
+  #   ports:
+  #     - 8080:8080
+  #   labels:
+  #     - traefik.enable=true
+  #     - traefik.http.routers.pfc-ipfs-gateway.rule=Host(`pfc-ipfs.localhost`)
+  #     - traefik.http.services.pfc-ipfs-gateway.loadbalancer.server.port=8080
 
 volumes:
   ipfs-volume:

@@ -16,27 +16,64 @@ services:
       - ../config/proxy/traefik/data:/data
       - ../config/proxy/traefik/config:/config
     command:
+      # API and Providers
       - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=traefik-network"
       - "--providers.file.directory=/config"
+      - "--providers.file.watch=true"
+      
+      # Entrypoints
       - "--entrypoints.web.address=:80"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--entrypoints.websecure.address=:443"
+      
+      # Let's Encrypt
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.letsencrypt.acme.email=${EMAIL}"
       - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
+      
+      # Logging
       - "--log.level=INFO"
+      - "--log.filePath=/logs/traefik.log"
+      - "--accesslog=true"
+      - "--accesslog.filePath=/logs/access.log"
+      
+      # Metrics - Simple Configuration
+      - "--metrics.prometheus=true"
+      
+      # Global Settings
+      - "--global.sendAnonymousUsage=false"
+    environment:
+      - TZ=UTC
+    # No health check to avoid issues
     labels:
       - "traefik.enable=true"
+      # Dashboard
       - "traefik.http.routers.traefik-dashboard.rule=Host(`${TRAEFIK_DOMAIN}`)"
       - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
       - "traefik.http.routers.traefik-dashboard.service=api@internal"
       - "traefik.http.routers.traefik-dashboard.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.traefik-dashboard.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-dashboard.middlewares=traefik-auth,secure-headers"
       - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      
+      # Essential Security Headers
+      - "traefik.http.middlewares.secure-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.secure-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.secure-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.secure-headers.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.secure-headers.headers.customFrameOptionsValue=SAMEORIGIN"
+      - "traefik.http.middlewares.secure-headers.headers.referrerPolicy=strict-origin-when-cross-origin"
+      
+      # Prometheus metrics endpoint (optional)
+      - "traefik.http.routers.traefik-metrics.rule=Host(`metrics.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.traefik-metrics.entrypoints=websecure"
+      - "traefik.http.routers.traefik-metrics.service=prometheus@internal"
+      - "traefik.http.routers.traefik-metrics.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.traefik-metrics.middlewares=traefik-auth"
 
 networks:
   traefik-network:

@@ -1,0 +1,26 @@
+{
+  "Bootstrap": [
+    "/dns4/ipfs-bootstrap-1.your-domain.com/tcp/4001/p2p/peer-id-1",
+    "/dns4/ipfs-bootstrap-2.your-domain.com/tcp/4001/p2p/peer-id-2"
+  ],
+  "Datastore": {
+    "StorageMax": "20GB",
+    "StorageGCWatermark": 85,
+    "GCPeriod": "1h"
+  },
+  "Gateway": {
+    "NoFetch": false,
+    "HTTPHeaders": {
+      "Access-Control-Allow-Origin": [
+        "https://ipfs.gleefun.io"
+      ],
+      "Access-Control-Allow-Methods": [
+        "GET"
+      ],
+      "Access-Control-Allow-Headers": [
+        "X-Requested-With",
+        "Range"
+      ]
+    }
+  }
+}

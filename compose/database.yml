@@ -1,21 +1,47 @@
 services:
   ipfs:
     image: ipfs/kubo:v0.34.1
+    container_name: ipfs
     restart: unless-stopped
-    env_file:
-      - ../config/database/ipfs/ipfs.env
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - IPFS_PROFILE=server
+      - IPFS_PATH=/data/ipfs
+      - IPFS_ROUTING=dht
+      - LIBP2P_FORCE_PNET=1
+      - LIBP2P_TCP_MUX=false
+      - IPFS_AUTO_TLS=false
+      - IPFS_SWARM_KEY_FILE=/data/ipfs/swarm.key
+      - IPFS_ENABLE_NAMESYS_PUBSUB=false
+      - IPFS_SWARM_ADDRESSES=/ip4/0.0.0.0/tcp/4001,/ip4/0.0.0.0/udp/4001/quic,/ip4/0.0.0.0/udp/4001/quic-v1
+      - IPFS_GATEWAY_WRITABLE=false
+      - IPFS_API_ALLOWED_ORIGINS=https://${IPFS_API_DOMAIN}
+      - IPFS_CONNECT_TIMEOUT=30s
+      - IPFS_API_MAX_SIZE=10485760
+      - IPFS_SWARM_CONN_MGR_LOW_WATER=50
+      - IPFS_SWARM_CONN_MGR_HIGH_WATER=200
+      - IPFS_SWARM_CONN_MGR_GRACE_PERIOD=20s
     volumes:
       - ipfs-data:/data/ipfs
       - ../config/database/ipfs/swarm.key:/data/ipfs/swarm.key:ro
-    command:
-      - "--routing=dhtclient"
+      - ../config/database/ipfs/custom-config.json:/container-init.d/01-custom-config.json:ro
     healthcheck:
       test: ["CMD", "ipfs", "dag", "stat", "/ipfs/QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 60s
     networks:
       - traefik-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     labels:
       - "traefik.enable=true"
       # Gateway service
@@ -25,6 +51,7 @@ services:
       - "traefik.http.routers.ipfs-gateway.tls.certresolver=letsencrypt"
       - "traefik.http.routers.ipfs-gateway.service=ipfs-gateway-service"
       - "traefik.http.services.ipfs-gateway-service.loadbalancer.server.port=8080"
+      - "traefik.http.routers.ipfs-gateway.middlewares=ipfs-security-headers"
       # API service
       - "traefik.http.routers.ipfs-api.rule=Host(`${IPFS_API_DOMAIN}`)"
       - "traefik.http.routers.ipfs-api.entrypoints=websecure"
@@ -32,11 +59,214 @@ services:
       - "traefik.http.routers.ipfs-api.tls.certresolver=letsencrypt"
       - "traefik.http.routers.ipfs-api.service=ipfs-api-service"
       - "traefik.http.services.ipfs-api-service.loadbalancer.server.port=5001"
-      - "traefik.http.routers.ipfs-api.middlewares=ipfs-api-auth"
+      - "traefik.http.routers.ipfs-api.middlewares=ipfs-api-auth,ipfs-security-headers,api-rate-limit"
       - "traefik.http.middlewares.ipfs-api-auth.basicauth.users=${IPFS_API_CREDENTIALS}"
+      # Security headers middleware
+      - "traefik.http.middlewares.ipfs-security-headers.headers.customResponseHeaders.X-Robots-Tag=none,noarchive,nosnippet,notranslate,noimageindex"
+      - "traefik.http.middlewares.ipfs-security-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.ipfs-security-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.ipfs-security-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.ipfs-security-headers.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.ipfs-security-headers.headers.referrerPolicy=strict-origin-when-cross-origin"
+      # Rate limiting for API
+      - "traefik.http.middlewares.api-rate-limit.ratelimit.average=100"
+      - "traefik.http.middlewares.api-rate-limit.ratelimit.burst=200"
+      - "traefik.http.middlewares.api-rate-limit.ratelimit.period=1m"
+
+  # # Optional IPFS Cluster for managing pinned content across multiple IPFS nodes
+  # ipfs-cluster:
+  #   image: ipfs/ipfs-cluster:v1.0.6
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - ipfs
+  #   environment:
+  #     - CLUSTER_PEERNAME=${COMPOSE_PROJECT_NAME}-cluster
+  #     - CLUSTER_SECRET=${IPFS_CLUSTER_SECRET}
+  #     - CLUSTER_IPFSHTTP_NODEMULTIADDRESS=/dns4/ipfs/tcp/5001
+  #     - CLUSTER_CRDT_TRUSTEDPEERS=*
+  #     - CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS=/ip4/0.0.0.0/tcp/9094
+  #     - CLUSTER_MONITORPINGINTERVAL=15s
+  #     - CLUSTER_STATESTORESYNCINTERVAL=5m
+  #   volumes:
+  #     - ipfs-cluster-data:/data/ipfs-cluster
+  #   healthcheck:
+  #     test: ["CMD", "ipfs-cluster-ctl", "--enc", "json", "id"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 90s
+  #   networks:
+  #     - traefik-network
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '1'
+  #         memory: 1G
+  #       reservations:
+  #         cpus: '0.2'
+  #         memory: 256M
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.ipfs-cluster.rule=Host(`cluster.${IPFS_DOMAIN}`)"
+  #     - "traefik.http.routers.ipfs-cluster.entrypoints=websecure"
+  #     - "traefik.http.routers.ipfs-cluster.tls=true"
+  #     - "traefik.http.routers.ipfs-cluster.tls.certresolver=letsencrypt"
+  #     - "traefik.http.routers.ipfs-cluster.service=ipfs-cluster-service"
+  #     - "traefik.http.services.ipfs-cluster-service.loadbalancer.server.port=9094"
+  #     - "traefik.http.routers.ipfs-cluster.middlewares=ipfs-cluster-auth,ipfs-security-headers"
+  #     - "traefik.http.middlewares.ipfs-cluster-auth.basicauth.users=${IPFS_CLUSTER_CREDENTIALS}"
+
+  redis:
+    image: valkey/valkey:8.1-alpine3.21
+    restart: unless-stopped
+    command:
+      - "valkey-server"
+      - "--requirepass ${REDIS_PASSWORD}"
+      - "--masteruser ${REDIS_USER}"
+      - "--masterauth ${REDIS_PASSWORD}"
+      - "--appendonly yes"
+      - "--appendfsync everysec"
+      - "--maxmemory 512mb"
+      - "--maxmemory-policy allkeys-lru"
+      - "--save 900 1"
+      - "--save 300 10"
+      - "--save 60 10000"
+      - "--loglevel notice"
+    environment:
+      - TZ=UTC
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - traefik-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    labels:
+      - "traefik.enable=false"
+      # If you need to expose Redis through Traefik, uncomment and configure:
+      # - "traefik.enable=true"
+      # - "traefik.http.routers.redis.rule=Host(`redis.gleefun.io`)"
+      # - "traefik.http.routers.redis.entrypoints=websecure"
+      # - "traefik.http.routers.redis.tls=true"
+      # - "traefik.http.routers.redis.tls.certresolver=letsencrypt"
+      # - "traefik.http.routers.redis.service=redis-service"
+      # - "traefik.http.services.redis-service.loadbalancer.server.port=6379"
+      # - "traefik.http.routers.redis.middlewares=redis-auth"
+      # - "traefik.http.middlewares.redis-auth.basicauth.users=${REDIS_CREDENTIALS}"
+
+  postgres:
+    image: postgres:17.4-alpine3.21
+    restart: unless-stopped
+    command:
+      - "postgres"
+      - "-c" 
+      - "max_connections=150"
+      - "-c" 
+      - "shared_buffers=512MB"
+      - "-c" 
+      - "effective_cache_size=1536MB"
+      - "-c" 
+      - "work_mem=16MB"
+      - "-c" 
+      - "maintenance_work_mem=128MB"
+      - "-c" 
+      - "random_page_cost=1.1"
+      - "-c" 
+      - "temp_file_limit=10GB"
+      - "-c" 
+      - "log_min_duration_statement=200ms"
+      - "-c" 
+      - "idle_in_transaction_session_timeout=10000"
+      - "-c" 
+      - "lock_timeout=1000"
+      - "-c" 
+      - "statement_timeout=60000"
+      - "-c" 
+      - "shared_preload_libraries=pg_stat_statements"
+      - "-c" 
+      - "pg_stat_statements.max=10000"
+      - "-c" 
+      - "pg_stat_statements.track=all"
+      - "-c" 
+      - "autovacuum=on"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gleefun}
+      POSTGRES_USER: ${POSTGRES_USER:-gleefun}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-e8FSNEX0kG4IREZxyOYU0OtS3YFIjp6EsQLmWGAd0Is=}
+      PGDATA: /var/lib/postgresql/data/pgdata
+      TZ: UTC
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ../config/database/postgres/init:/docker-entrypoint-initdb.d
+      - /etc/localtime:/etc/localtime:ro
+      - ../config/database/postgres/backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gleefun}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - traefik-network
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    labels:
+      - "traefik.enable=false"
+      # Uncomment if you need to expose PostgreSQL through Traefik (not recommended for production)
+      # - "traefik.enable=true"
+      # - "traefik.tcp.routers.postgres.rule=HostSNI(`postgres.gleefun.io`)"
+      # - "traefik.tcp.routers.postgres.entrypoints=postgresql"
+      # - "traefik.tcp.routers.postgres.tls=true"
+      # - "traefik.tcp.routers.postgres.tls.certresolver=letsencrypt"
+      # - "traefik.tcp.routers.postgres.service=postgres-service"
+      # - "traefik.tcp.services.postgres-service.loadbalancer.server.port=5432"
+
+  # # Optional: PostgreSQL backup service
+  # postgres-backup:
+  #   image: prodrigestivill/postgres-backup-local:16
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     POSTGRES_HOST: postgres
+  #     POSTGRES_DB: ${POSTGRES_DB:-gleefun}
+  #     POSTGRES_USER: ${POSTGRES_USER:-gleefun}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-e8FSNEX0kG4IREZxyOYU0OtS3YFIjp6EsQLmWGAd0Is=}
+  #     POSTGRES_EXTRA_OPTS: "-Z9 --schema=public --blobs"
+  #     SCHEDULE: "@daily"
+  #     BACKUP_KEEP_DAYS: 7
+  #     BACKUP_KEEP_WEEKS: 4
+  #     BACKUP_KEEP_MONTHS: 6
+  #     HEALTHCHECK_PORT: 8080
+  #   volumes:
+  #     - ./config/database/postgres/backups:/backups
+  #   networks:
+  #     - traefik-network
+  #   labels:
+  #     - "traefik.enable=false"
 
 volumes:
   ipfs-data:
+  ipfs-cluster-data:
+  redis-data:
+  postgres-data:
 
 networks:
   traefik-network:
