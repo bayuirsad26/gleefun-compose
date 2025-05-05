@@ -1,0 +1,43 @@
+services:
+  ipfs:
+    image: ipfs/kubo:v0.34.1
+    restart: unless-stopped
+    env_file:
+      - ../config/database/ipfs/ipfs.env
+    volumes:
+      - ipfs-data:/data/ipfs
+      - ../config/database/ipfs/swarm.key:/data/ipfs/swarm.key:ro
+    command:
+      - "--routing=dhtclient"
+    healthcheck:
+      test: ["CMD", "ipfs", "dag", "stat", "/ipfs/QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - traefik-network
+    labels:
+      - "traefik.enable=true"
+      # Gateway service
+      - "traefik.http.routers.ipfs-gateway.rule=Host(`${IPFS_DOMAIN}`)"
+      - "traefik.http.routers.ipfs-gateway.entrypoints=websecure"
+      - "traefik.http.routers.ipfs-gateway.tls=true"
+      - "traefik.http.routers.ipfs-gateway.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ipfs-gateway.service=ipfs-gateway-service"
+      - "traefik.http.services.ipfs-gateway-service.loadbalancer.server.port=8080"
+      # API service
+      - "traefik.http.routers.ipfs-api.rule=Host(`${IPFS_API_DOMAIN}`)"
+      - "traefik.http.routers.ipfs-api.entrypoints=websecure"
+      - "traefik.http.routers.ipfs-api.tls=true"
+      - "traefik.http.routers.ipfs-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ipfs-api.service=ipfs-api-service"
+      - "traefik.http.services.ipfs-api-service.loadbalancer.server.port=5001"
+      - "traefik.http.routers.ipfs-api.middlewares=ipfs-api-auth"
+      - "traefik.http.middlewares.ipfs-api-auth.basicauth.users=${IPFS_API_CREDENTIALS}"
+
+volumes:
+  ipfs-data:
+
+networks:
+  traefik-network:
+    external: true

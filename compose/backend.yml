@@ -1,0 +1,259 @@
+x-backend-base-environment: &backend-base-environment
+  APP_MODE: production
+  APP_LOCALE: en-US
+  APP_BOTS: 'eip155:97/0xbbabd61B1aEb5cbb1901Ee253b8c23134c5Aaa03,eip155:97/0xb7C64738973aFB634C90b4ECd5d39d59A66fB30f,eip155:97/0xbfEeb4aADD531a8f0C836E57D156a54aFD79Ab83,eip155:97/0xb443F76AC596F65561040078dFC99382665f1E43,eip155:97/0xb27bEdbf06f0A7f0551a3415677c1baA6c8a9411,eip155:97/0xb750F65E45813d7152CB12df95E7f0326f596EB1,eip155:97/0xb1b19de9148230E1A0972E12fb4993DCf0bf0621,eip155:97/0xbF6fE4854073C8bD59C5e38a208dD6A9a0A5d092,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/b1cEC2YxWcKMwWeUJMRE1AR5QhvyFZochpLv79dN7FR,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/b21zGp4WeFgYq6MaPwN2hzXythPsKnyy3oYkNv4Y6cy,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/b4e3sfZV4FddQE8btCDrKLCpqCNUoCtr71TeNa7H1Xf,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/b5R8f6Tf19b8U6UGrytHNHamBdpV8TW96xoRmCYQUF6,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/b6vqeM9CiA2wmijp1RQuJBwQYuwmjuybyrNfDozBbek,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/b8A79PhkAUFaSjeLYLw7kzdWFLYJGkBHs8rdgagBkdJ,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bALvkSDu4LdjQkYHXBBA3ZmbogKMcbDkD1UfKEwwkx9,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bDogm5J68AwkJoqAa6W3vdWXtzjCxofioJHsShUMd3q,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bDvcoZSgmJntatwGdjGQ6BQCgvD8gG5S9NFELRyu2jB,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bG5BNoNFayEz9BtrK9FJMieFAx1fp8rLeRybCmhuEjL,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bHmJwJQ4juJRAXEbTYnT7N6gXsMGhVDMcWK57NKyLaq,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bideYhVBZ8WZDXstDJ2JzD6sdT4VK4kHH7kj5Se7pPi,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bioBbwFWcFerXEbmVjwKR8mix3wBQZLK8K4Jn6154VT,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bJfGgMhdtV3RaYNqp1PXctsGQEw8WPueaBv7BZMkcT6,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bJJQLwZz3evcQvNYpxGNDfRbGrHacGW9efiL3Qshr7D,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bKguLB72UgHRc84KyJ2aDKvLkVUhRdtG2RRo5Fpk15L,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bkQ99sCWHp7BMARsnU6JoBioBS2xG3iTpQkuM7Aioca,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bLKJ8sEyjimBr3rrGNgQgRwSgW17AtMqN16wSafcM9a,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bLptshnsY5PSFqVNjAWoYwaNNpWzKbmK7qaFem8tMqh,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bmiPPrzbMxeZTTjmueooxrVMi5g9jDnj7e67YC4EXGX,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bnSfM4GbexEhky8ic6zRocU8GJ2VmiNUxxWRqYAfnrA,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/boEW6nqZsPjBfDgiqn1rm3Umkp3WJQjXWQB5B51HzcB,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bwy6b8F5SRCVv6Vd1kQ4y9rkYkUa84XdZkouNcfNkK1,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bXeur5VTUC81zrXBYctkLqPJXSGXVryn15AwWkcNnxq,solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1/bxJ9M7GJsR7ZZUWuTCCXwtAY5e6gsoDXTP8niZFY5eK'
+  API_HTTP_HOST: 0.0.0.0
+  API_HTTP_PORT: 5100
+  API_ALLOWED_ORIGINS: http://localhost:5173,http://192.168.0.47:5173,http://pfc-api.localhost:4080
+  API_HCAPTCHA_SECRET_KEY: ES_51180db7832a4b2db0f74a92b6e81c6c
+  BLOCKCHAIN_SOLANA_MAINNET_RPC_URLS: https://nina.rpcpool.com/a4720dd909cb194f1d9ea07d50ee
+  BLOCKCHAIN_SOLANA_DEVNET_RPC_URLS: 
+  DB_HOST: postgres
+  DB_PORT: 5432
+  DB_USER: gleefun
+  DB_PASS: e8FSNEX0kG4IREZxyOYU0OtS3YFIjp6EsQLmWGAd0Is=
+  DB_MODE: production
+  EE_REDIS_HOST: redis
+  EE_REDIS_PORT: 6379
+  EE_REDIS_USER: gleefun
+  EE_REDIS_PASSWORD: uHBdXt3Wg31yx8EMKE7GFMcehUvgIuu8zqtmtvlDIG0=
+  KV_REDIS_HOST: redis
+  KV_REDIS_PORT: 6379
+  KV_REDIS_USER: gleefun
+  KV_REDIS_PASSWORD: GFVRksFJmQw3HL5jufohzqFLWW/ymbjdCNTisWXDTJM=
+  FILE_STORAGE_IPFS_URL: https://backend2-ipfs.fh47.my.id/ipfs/CID
+  FILE_STORAGE_KUBO_URL: http://ipfs:5001
+  FILE_STORAGE_DEPLOYMENT_URL: http://pfc-api.localhost:4080
+  CRYPTOGRAPHY_ENCRYPTION_KEY: 5a6afab74cf3b13ebdfc125d330d4ac1fa7b2b3cbb4eccc33049faea907b1ad9
+  OTEL_ENABLE: false
+  OTEL_SERVICE_NAME: pfc-backend
+  OTEL_METRIC_EXPORT_INTERVAL: 5000
+  OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
+  OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+
+x-backend-base: &backend-base
+  image: devopsnusatech/gleefun-api:prod
+  depends_on:
+    ipfs: { condition: service_healthy }
+    otel-collector: { condition: service_started }
+    postgres: { condition: service_healthy }
+    redis: { condition: service_healthy }
+  environment:
+    <<: *backend-base-environment
+
+x-backend-migration: &backend-migration
+  <<: *backend-base
+  depends_on:
+    ipfs: { condition: service_healthy }
+    otel-collector: { condition: service_started }
+    postgres: { condition: service_healthy }
+    redis: { condition: service_healthy }
+
+x-backend-ready: &backend-ready
+  <<: *backend-migration
+  depends_on:
+    ipfs: { condition: service_healthy }
+    otel-collector: { condition: service_started }
+    postgres: { condition: service_healthy }
+    redis: { condition: service_healthy }
+    # seed: { condition: service_completed_successfully }
+
+x-backend-public: &backend-public
+  <<: *backend-ready
+  depends_on:
+    ipfs: { condition: service_healthy }
+    otel-collector: { condition: service_started }
+    postgres: { condition: service_healthy }
+    redis: { condition: service_healthy }
+    # seed: { condition: service_completed_successfully }
+    traefik: { condition: service_started }
+
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.123.0
+    command: ["--config=/etc/otel-collector-config.yml"]
+    depends_on:
+      jaeger: { condition: service_started }
+      prometheus: { condition: service_started }
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
+
+  jaeger:
+    image: jaegertracing/jaeger:2.5.0
+    environment:
+      - LOG_LEVEL=debug
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pfc-jaeger-ui.rule=Host(`pfc-jaeger.localhost`)
+      - traefik.http.services.pfc-jaeger-ui.loadbalancer.server.port=16686
+
+  prometheus:
+    image: prom/prometheus:v3.3.0
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pfc-prometheus.rule=Host(`pfc-prometheus.localhost`)
+      - traefik.http.services.pfc-prometheus.loadbalancer.server.port=9090
+
+  migration:
+    <<: *backend-base
+    command: node app/cmd/cmd.js migrate
+    environment:
+      <<: *backend-base-environment
+      OTEL_SERVICE_NAME: pfc-migration
+    labels:
+      - traefik.enable=false
+
+  seed:
+    <<: *backend-migration
+    command: node app/cmd/cmd.js seed
+    depends_on:
+      migration: { condition: service_completed_successfully }
+    environment:
+      <<: *backend-base-environment
+      OTEL_SERVICE_NAME: pfc-seed
+    labels:
+      - traefik.enable=false
+
+  api:
+    <<: *backend-public
+    command: node app/cmd/cmd.js api
+    deploy:
+      replicas: 1
+    environment:
+      <<: *backend-base-environment
+      OTEL_SERVICE_NAME: pfc-api
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pfc-api.rule=Host(`pfc-api.localhost`)
+      - traefik.http.services.pfc-api.loadbalancer.server.port=5100
+
+  bot:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js bot
+    environment:
+      <<: *backend-base-environment
+      OTEL_SERVICE_NAME: pfc-bot
+    labels:
+      - traefik.enable=false
+
+  chart:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js chart
+    environment:
+      <<: *backend-base-environment
+      OTEL_SERVICE_NAME: pfc-chart
+    labels:
+      - traefik.enable=false
+
+  graduation:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js graduation
+    environment:
+      <<: *backend-base-environment
+      OTEL_SERVICE_NAME: pfc-graduation
+    labels:
+      - traefik.enable=false
+
+  indexer:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js indexer
+    environment:
+      <<: *backend-base-environment
+      OTEL_SERVICE_NAME: pfc-indexer
+    labels:
+      - traefik.enable=false
+
+  indexer-of-solana:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js indexer-of-solana
+    environment:
+      <<: *backend-base-environment
+      OTEL_SERVICE_NAME: pfc-indexer-of-solana
+    labels:
+      - traefik.enable=false
+
+  interval:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js interval
+    environment:
+      <<: *backend-base-environment
+      OTEL_SERVICE_NAME: pfc-interval
+    labels:
+      - traefik.enable=false
+
+  trade:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js trade
+    environment:
+      <<: *backend-base-environment
+      OTEL_SERVICE_NAME: pfc-trade
+    labels:
+      - traefik.enable=false
+
+  withdrawal:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js withdrawal
+    environment:
+      <<: *backend-base-environment
+      OTEL_SERVICE_NAME: pfc-withdrawal
+    labels:
+      - traefik.enable=false
+
+  postgres:
+    image: postgres:17.4-alpine3.21
+    command: ["postgres", "-c", "log_statement=all"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 500ms
+      retries: 30
+      timeout: 15s
+    environment:
+      POSTGRES_DB: gleefun
+      POSTGRES_USER: gleefun
+      POSTGRES_PASSWORD: e8FSNEX0kG4IREZxyOYU0OtS3YFIjp6EsQLmWGAd0Is=
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pfc-postgres.rule=Host(`pfc-postgres.localhost`)
+      - traefik.http.services.pfc-postgres.loadbalancer.server.port=5432
+
+  redis:
+    image: valkey/valkey:8.1-alpine3.21
+    command: ["valkey-server", "--loglevel", "verbose"]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 500ms
+      retries: 30
+      timeout: 15s
+    volumes:
+      - redis-volume:/data
+    labels:
+      - traefik.enable=false
+
+  ipfs:
+    image: ipfs/kubo:v0.34.1
+    depends_on:
+      - traefik
+    volumes:
+      - ipfs-volume:/data/ipfs
+    ports:
+      - 8080:8080
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pfc-ipfs-gateway.rule=Host(`pfc-ipfs.localhost`)
+      - traefik.http.services.pfc-ipfs-gateway.loadbalancer.server.port=8080
+
+volumes:
+  ipfs-volume:
+  postgres-volume:
+  loki-volume:
+  mimir-volume:
+  tempo-volume:
+  redis-volume:
