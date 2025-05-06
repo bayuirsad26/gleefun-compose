@@ -1,0 +1,46 @@
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.123.0
+    command: ["--config=/etc/otel-collector-config.yml"]
+    depends_on:
+      jaeger: { condition: service_started }
+      prometheus: { condition: service_started }
+    volumes:
+      - ./otel-collector-config.yml:/etc/otel-collector-config.yml
+    networks:
+      - traefik-network
+
+  jaeger:
+    image: jaegertracing/jaeger:2.5.0
+    environment:
+      - LOG_LEVEL=debug
+    networks:
+      - traefik-network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pfc-jaeger-ui.rule=Host(`pfc-jaeger.localhost`)
+      - traefik.http.services.pfc-jaeger-ui.loadbalancer.server.port=16686
+
+  prometheus:
+    image: prom/prometheus:v3.3.0
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    networks:
+      - traefik-network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.pfc-prometheus.rule=Host(`pfc-prometheus.localhost`)
+      - traefik.http.services.pfc-prometheus.loadbalancer.server.port=9090
+
+volumes:
+  loki-volume:
+  mimir-volume:
+  tempo-volume:
+
+networks:
+  traefik-network:
+    external: true

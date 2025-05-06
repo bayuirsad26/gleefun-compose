@@ -12,7 +12,7 @@
     "NoFetch": false,
     "HTTPHeaders": {
       "Access-Control-Allow-Origin": [
-        "https://ipfs.gleefun.io"
+        "https://${IPFS_DOMAIN}"
       ],
       "Access-Control-Allow-Methods": [
         "GET"

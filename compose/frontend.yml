@@ -1,0 +1,51 @@
+services:
+  frontend:
+    image: ${FRONTEND_IMAGE}
+    restart: unless-stopped
+    networks:
+      - traefik-network
+    deploy:
+      replicas: ${FRONTEND_REPLICAS}
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      - NODE_ENV=production
+      - TZ=UTC
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gleefun-frontend.rule=Host(`${FRONTEND_DOMAIN}`)
+      - traefik.http.routers.gleefun-frontend.entrypoints=websecure
+      - traefik.http.services.gleefun-frontend.loadbalancer.server.port=80
+      - traefik.http.routers.gleefun-frontend.tls=true
+      - traefik.http.routers.gleefun-frontend.tls.certresolver=letsencrypt
+      # Security headers
+      - traefik.http.routers.gleefun-frontend.middlewares=frontend-security,frontend-compression
+      - traefik.http.middlewares.frontend-security.headers.stsSeconds=31536000
+      - traefik.http.middlewares.frontend-security.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.frontend-security.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.frontend-security.headers.browserXssFilter=true
+      - traefik.http.middlewares.frontend-security.headers.referrerPolicy=strict-origin-when-cross-origin
+      - traefik.http.middlewares.frontend-security.headers.frameDeny=true
+      # Content compression
+      - traefik.http.middlewares.frontend-compression.compress=true
+
+networks:
+  traefik-network:
+    external: true
