@@ -121,25 +121,26 @@ services:
       - traefik.http.middlewares.api-security.headers.browserXssFilter=true
       - traefik.http.middlewares.api-security.headers.referrerPolicy=strict-origin-when-cross-origin
       # CORS Configuration
+      - traefik.http.middlewares.api-cors.headers.accessControlAllowCredentials=true
       - traefik.http.middlewares.api-cors.headers.accessControlAllowMethods=GET,OPTIONS,PUT,POST,DELETE
       - traefik.http.middlewares.api-cors.headers.accessControlAllowOriginList=${API_ALLOWED_ORIGINS}
       - traefik.http.middlewares.api-cors.headers.accessControlAllowHeaders=Content-Type,Authorization,X-Requested-With
-      - traefik.http.middlewares.api-cors.headers.accessControlMaxAge=100
+      - traefik.http.middlewares.api-cors.headers.accessControlMaxAge=86400
       - traefik.http.middlewares.api-cors.headers.addVaryHeader=true
 
-  # Bot service
-  bot:
-    <<: *backend-ready
-    command: node app/cmd/cmd.js bot
-    deploy:
-      replicas: ${SERVICE_REPLICAS}
-      update_config:
-        parallelism: 1
-        order: start-first
-    environment:
-      OTEL_SERVICE_NAME: pfc-bot
-    labels:
-      - traefik.enable=false
+  # # Bot service
+  # bot:
+  #   <<: *backend-ready
+  #   command: node app/cmd/cmd.js bot
+  #   deploy:
+  #     replicas: ${SERVICE_REPLICAS}
+  #     update_config:
+  #       parallelism: 1
+  #       order: start-first
+  #   environment:
+  #     OTEL_SERVICE_NAME: pfc-bot
+  #   labels:
+  #     - traefik.enable=false
 
   # Chart service
   chart:
