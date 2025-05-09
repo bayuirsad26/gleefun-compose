@@ -25,9 +25,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    environment:
-      - NODE_ENV=production
-      - TZ=UTC
+    env_file:
+      - ../config/frontend/app.env
     labels:
       - traefik.enable=true
       - traefik.http.routers.gleefun-frontend.rule=Host(`${FRONTEND_DOMAIN}`)
