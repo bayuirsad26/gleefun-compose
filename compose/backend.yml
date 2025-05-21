@@ -129,18 +129,18 @@ services:
       - traefik.http.middlewares.api-cors.headers.addVaryHeader=true
 
   # # Bot service
-  # bot:
-  #   <<: *backend-ready
-  #   command: node app/cmd/cmd.js bot
-  #   deploy:
-  #     replicas: ${SERVICE_REPLICAS}
-  #     update_config:
-  #       parallelism: 1
-  #       order: start-first
-  #   environment:
-  #     OTEL_SERVICE_NAME: pfc-bot
-  #   labels:
-  #     - traefik.enable=false
+  bot:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js bot
+    deploy:
+      replicas: ${SERVICE_REPLICAS}
+      update_config:
+        parallelism: 1
+        order: start-first
+    environment:
+      OTEL_SERVICE_NAME: pfc-bot
+    labels:
+      - traefik.enable=false
 
   # Chart service
   chart:
@@ -237,6 +237,90 @@ services:
         order: start-first
     environment:
       OTEL_SERVICE_NAME: pfc-withdrawal
+    labels:
+      - traefik.enable=false
+
+  # Broadcast via Telegram service
+  broadcast-via-telegram:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js broadcast-via-telegram
+    deploy:
+      replicas: ${SERVICE_REPLICAS}
+      update_config:
+        parallelism: 1
+        order: start-first
+    environment:
+      OTEL_SERVICE_NAME: pfc-broadcast-via-telegram
+    labels:
+      - traefik.enable=false
+
+  # Report of Revenue service
+  report-of-revenue:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js report-of-revenue
+    deploy:
+      replicas: ${SERVICE_REPLICAS}
+      update_config:
+        parallelism: 1
+        order: start-first
+    environment:
+      OTEL_SERVICE_NAME: pfc-report-of-revenue
+    labels:
+      - traefik.enable=false
+
+  # Token Unlock service
+  token-unlock:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js token-unlock
+    deploy:
+      replicas: ${SERVICE_REPLICAS}
+      update_config:
+        parallelism: 1
+        order: start-first
+    environment:
+      OTEL_SERVICE_NAME: pfc-token-unlock
+    labels:
+      - traefik.enable=false
+
+  # Token Creation Airdrop service
+  token-creation-airdrop:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js token-creation-airdrop
+    deploy:
+      replicas: ${SERVICE_REPLICAS}
+      update_config:
+        parallelism: 1
+        order: start-first
+    environment:
+      OTEL_SERVICE_NAME: pfc-token-creation-airdrop
+    labels:
+      - traefik.enable=false
+
+  # Withdrawal of Revenue service
+  withdrawal-of-revenue:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js withdrawal-of-revenue
+    deploy:
+      replicas: ${SERVICE_REPLICAS}
+      update_config:
+        parallelism: 1
+        order: start-first
+    environment:
+      OTEL_SERVICE_NAME: pfc-withdrawal-of-revenue
+    labels:
+      - traefik.enable=false
+
+  # Referral service
+  referral:
+    <<: *backend-ready
+    command: node app/cmd/cmd.js referral
+    deploy:
+      replicas: ${SERVICE_REPLICAS}
+      update_config:
+        parallelism: 1
+        order: start-first
+    environment:
+      OTEL_SERVICE_NAME: pfc-referral
     labels:
       - traefik.enable=false
 

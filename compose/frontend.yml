@@ -45,6 +45,44 @@ services:
       # Content compression
       - traefik.http.middlewares.frontend-compression.compress=true
 
+  admin:
+    image: ${ADMIN_IMAGE}
+    restart: unless-stopped
+    networks:
+      - traefik-network
+    deploy:
+      replicas: ${ADMIN_REPLICAS}
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gleefun-admin.rule=Host(`${ADMIN_DOMAIN}`)
+      - traefik.http.routers.gleefun-admin.entrypoints=websecure
+      - traefik.http.services.gleefun-admin.loadbalancer.server.port=3000
+      - traefik.http.routers.gleefun-admin.tls=true
+      - traefik.http.routers.gleefun-admin.tls.certresolver=letsencrypt
+      # Security headers
+      - traefik.http.routers.gleefun-admin.middlewares=admin-security,admin-compression
+      - traefik.http.middlewares.admin-security.headers.stsSeconds=31536000
+      - traefik.http.middlewares.admin-security.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.admin-security.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.admin-security.headers.browserXssFilter=true
+      - traefik.http.middlewares.admin-security.headers.referrerPolicy=strict-origin-when-cross-origin
+      - traefik.http.middlewares.admin-security.headers.frameDeny=true
+      # Content compression
+      - traefik.http.middlewares.admin-compression.compress=true
+
 networks:
   traefik-network:
     external: true
