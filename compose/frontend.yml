@@ -12,13 +12,13 @@ services:
         order: start-first
       restart_policy:
         condition: on-failure
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-        reservations:
-          cpus: '0.1'
-          memory: 128M
+      # resources:
+      #   limits:
+      #     cpus: '0.5'
+      #     memory: 512M
+      #   reservations:
+      #     cpus: '0.1'
+      #     memory: 128M
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
       interval: 30s
@@ -58,13 +58,13 @@ services:
         order: start-first
       restart_policy:
         condition: on-failure
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-        reservations:
-          cpus: '0.1'
-          memory: 128M
+      # resources:
+      #   limits:
+      #     cpus: '0.5'
+      #     memory: 512M
+      #   reservations:
+      #     cpus: '0.1'
+      #     memory: 128M
     labels:
       - traefik.enable=true
       - traefik.http.routers.gleefun-admin.rule=Host(`${ADMIN_DOMAIN}`)

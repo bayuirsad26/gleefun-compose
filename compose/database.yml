@@ -34,14 +34,14 @@ services:
       start_period: 60s
     networks:
       - traefik-network
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 2G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '2'
+    #       memory: 2G
+    #     reservations:
+    #       cpus: '0.5'
+    #       memory: 512M
     labels:
       - "traefik.enable=true"
       # Gateway service
@@ -133,6 +133,7 @@ services:
   postgres:
     image: postgres:17.4-alpine3.21
     restart: unless-stopped
+    shm_size: '2gb'
     command:
       - "postgres"
       - "-c" 
@@ -184,14 +185,14 @@ services:
       start_period: 30s
     networks:
       - traefik-network
-    deploy:
-      resources:
-        limits:
-          cpus: '4'
-          memory: 4G
-        reservations:
-          cpus: '1'
-          memory: 1G
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '4'
+    #       memory: 4G
+    #     reservations:
+    #       cpus: '1'
+    #       memory: 1G
     labels:
       - "traefik.enable=false"
       # Uncomment if you need to expose PostgreSQL through Traefik (not recommended for production)

@@ -93,13 +93,13 @@ services:
         order: start-first
       restart_policy:
         condition: on-failure
-      resources:
-        limits:
-          cpus: '2'
-          memory: 2G
-        reservations:
-          cpus: '0.5'
-          memory: 512M
+      # resources:
+      #   limits:
+      #     cpus: '2'
+      #     memory: 2G
+      #   reservations:
+      #     cpus: '0.5'
+      #     memory: 512M
     environment:
       OTEL_SERVICE_NAME: pfc-api
     labels:
